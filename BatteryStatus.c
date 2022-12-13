@@ -44,15 +44,11 @@ int GetBatteryParamStatus(float value, tst_BatParamLimits limits,
                 void (*printConsole)(float, char*, char*), char* printstr){
 
     if(value < limits.minValue ){
-        if(printConsole != 0){
-            (*printConsole)(value, "LOW", printstr);
-        }
+         (*printConsole)(value, "LOW", printstr);
         return INVALID_RANGE_LOW;
     }
     else if(value > limits.maxValue){
-        if(printConsole != 0){
-            (*printConsole)(value, "HIGH", printstr);
-        }
+         (*printConsole)(value, "HIGH", printstr);
         return INVALID_RANGE_HIGH;
     }
     else{
