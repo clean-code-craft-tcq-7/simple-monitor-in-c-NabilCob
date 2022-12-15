@@ -2,7 +2,6 @@
 #include "BatteryStatus.h"
 #include "IO.h"
 
-//
 const tst_BatParamLimits TempLimit = {
  .minValue = TEMP_MIN_VALUE,
  .maxValue = TEMP_MAX_VALUE
@@ -15,10 +14,9 @@ const tst_BatParamLimits ChargeRateLimit = {
  .minValue =CHARGE_RATE_MIN_VALUE,
  .maxValue =CHARGE_RATE_MAX_VALUE
 };
-//
+
 int BatteryState[MAX_BATTERY_PARAMETERS] = {0};
 
-//
 int batteryIsOk(float temperature, float soc, float chargeRate) {
 
   int lp;
@@ -39,7 +37,6 @@ int batteryIsOk(float temperature, float soc, float chargeRate) {
 }
 
 
-//
 int GetBatteryParamStatus(float value, tst_BatParamLimits limits,
                 void (*printConsole)(float, char*, char*), char* printstr){
 
