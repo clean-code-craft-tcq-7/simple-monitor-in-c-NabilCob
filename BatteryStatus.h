@@ -3,23 +3,15 @@
 
 #define TEMP_MIN_VALUE   (0)
 #define TEMP_MAX_VALUE   (45)
+#define Temp_Tolerance   (5)
 
 #define SOC_MIN_VALUE    (20)
 #define SOC_MAX_VALUE    (80)
+#define Soc_Tolerance   (5)
 
 #define CHARGE_RATE_MIN_VALUE  (-1)
 #define CHARGE_RATE_MAX_VALUE   (0.8)
-
-typedef struct{
-    float minValue;
-    float maxValue;
-}tst_BatParamLimits;
-
-typedef struct{
-    int tempStatus;
-    int socStatus;
-    int chargeRateStatus;
-}tst_BatParmStatus;
+#define ChargeRate_Tolerance   (5)
 
 typedef enum{
     BATTERY_TEMPERATURE = 0,
@@ -34,8 +26,40 @@ typedef enum{
     INVALID_RANGE_HIGH,
 } tst_BatParmStates;
 
-int batteryIsOk(float temperature, float soc, float chargeRate);
-int GetBatteryParamStatus(float value, tst_BatParamLimits limits,
-                void (*printConsole)(float, char*, char*), char* printstr);
 
+typedef struct{
+    float minValue;
+    float maxValue;
+}tst_BatteryParmLimits;
+
+
+typedef struct{
+    int tolerence;
+    tst_BatteryParmLimits limits;
+}tst_TolerenceLimits;
+
+typedef struct{
+    float value;
+    tst_BatteryParmLimits limits;
+    tst_TolerenceLimits tolerancelimits;
+    int status;
+    int errorMessage;
+    int warningMessage;
+    int (*callback_warning)(void*, void*);
+}tst_SensorInputs;
+
+typedef struct{
+    tst_SensorInputs data[MAX_BATTERY_PARAMETERS];
+    void (*printMessage)(void*);
+}tst_SensorParm;
+
+
+int batteryIsOk(float temperature, float soc, float chargeRate);
+int GetBatteryParamStatus(void*, void*);
+int GetBatteryParamWarningStatus(void*, void*);
+int CalculateTolerance(int value, int tolerance);
+void init_Limits(void *inputList, float value, tst_BatteryParmLimits limit, int tolerance);
+void init_registerCallback(void *inputList, void *callback_fn);
+void init_ConfigureMessage(void *inputList, void * errormsg, void * warningmsg);
 #endif
+
