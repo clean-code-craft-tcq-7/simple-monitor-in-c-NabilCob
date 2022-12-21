@@ -72,8 +72,8 @@ void init_registerCallback(void *inputList, void *callback_fn){
 
 void init_ConfigureMessage(void *inputList, void * errormessage, void * warningmessage){
     tst_SensorInputs* input = (tst_SensorInputs*)inputList;
-    input->errorMessage = (int)errormessage;
-    input->warningMessage = (int)warningmessage;
+    input->errorMessage = errormessage;
+    input->warningMessage = warningmessage;
 }
 
 int GetBatteryParamStatus(void * inputList, void* inputValue){
