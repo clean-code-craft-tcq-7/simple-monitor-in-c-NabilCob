@@ -27,24 +27,24 @@ int batteryIsOk(float temperature, float soc, float chargeRate) {
   tst_SensorInputs tempInput ;
   init_Limits(&tempInput, temperature, TempLimit, Temp_Tolerance);
   init_registerCallback(&tempInput, GetBatteryParamWarningStatus);
-  init_ConfigureMessage(&tempInput,Temperature_out_of_range,
-                             Temperature_warning);
+  init_ConfigureMessage(&tempInput,(void*)Temperature_out_of_range,
+                             (void*)Temperature_warning);
   tempInput.status = GetBatteryParamStatus(&sensorParm, &tempInput);
   sensorParm.data[BATTERY_TEMPERATURE] = tempInput;
 
   tst_SensorInputs socInput;
   init_Limits(&socInput, soc, SocLimit, Soc_Tolerance);
   init_registerCallback(&socInput, GetBatteryParamWarningStatus);
-  init_ConfigureMessage(&socInput,State_of_Charge_out_of_range,
-                  Soc_Warning);
+  init_ConfigureMessage(&socInput,(void*)State_of_Charge_out_of_range,
+                  (void*)Soc_Warning);
   socInput.status = GetBatteryParamStatus(&sensorParm, &socInput);
   sensorParm.data[SOC] = socInput;
 
   tst_SensorInputs chargeRateInput;
   init_Limits(&chargeRateInput, chargeRate, ChargeRateLimit, ChargeRate_Tolerance);
   init_registerCallback(&chargeRateInput, GetBatteryParamWarningStatus);
-  init_ConfigureMessage(&chargeRateInput,Charge_Rate_out_of_range,
-                  ChargeRate_Warning);
+  init_ConfigureMessage(&chargeRateInput,(void*)Charge_Rate_out_of_range,
+                  (void*)ChargeRate_Warning);
   chargeRateInput.status = GetBatteryParamStatus(&sensorParm, &chargeRateInput);
   sensorParm.data[CHARGE_RATE] = chargeRateInput;
 
