@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include "IO.h"
 #include "LanguageString.h"
-#include "ApplicationConfig.h"
+#include "BatteryStatus.h"
 
 
 void PrintMessage(void* printmessage){
