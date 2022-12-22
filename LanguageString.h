@@ -13,6 +13,7 @@ typedef enum{
     Soc_Warning,
     ChargeRate_Warning,
     Default,
+    Valid,
     Max_error_messages,
 }errorList;
 
@@ -30,3 +31,4 @@ typedef struct{
 
 extern const LangArray_t stringsArray[Max_error_messages];
 #endif
+
