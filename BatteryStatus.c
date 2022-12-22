@@ -20,27 +20,11 @@ const tst_BatteryParmLimits ChargeRateLimit = {
 const int Langaugedefined = English;
 tst_SensorParm sensorParm;
 
-void init_Limits(void *inputList, tst_BatteryParmLimits limit, int tolerance){
-    tst_SensorInputs* input = (tst_SensorInputs*)inputList;
-    input->limits.minValue = limit.minValue;
-    input->limits.maxValue = limit.maxValue;
-    input->tolerancelimits.tolerence = tolerance;
-}
 
-void init_registerCallback(void *inputList, void *callback_fn){
-    tst_SensorInputs* input = (tst_SensorInputs*)inputList;
-    input->callback_warning = callback_fn;
-}
-
-void init_ConfigureMessage(void *inputList, void * errormsg, void * warningmsg){
-    tst_SensorInputs* input = (tst_SensorInputs*)inputList;
-    input->errorMessage = errormsg;
-    input->warningMessage = warningmsg;
-}
 int batteryIsOk(float temperature, float soc, float chargeRate) {
 
   int lp;
-  //Take a local copy
+
   tst_SensorInputs tempInput = sensorParm.data[BATTERY_TEMPERATURE];
   tst_SensorInputs socInput = sensorParm.data[SOC];
   tst_SensorInputs chargeRateInput = sensorParm.data[CHARGE_RATE];
@@ -63,30 +47,49 @@ int batteryIsOk(float temperature, float soc, float chargeRate) {
   return Valid;
 }
 
+void init_Limits(void *inputList, tst_BatteryParmLimits limit, int tolerance){
+    tst_SensorInputs* input = (tst_SensorInputs*)inputList;
+    input->limits.minValue = limit.minValue;
+    input->limits.maxValue = limit.maxValue;
+    input->tolerancelimits.tolerence = tolerance;
+}
+
+void init_registerCallback(void *inputList, void *callback_fn){
+    tst_SensorInputs* input = (tst_SensorInputs*)inputList;
+    input->callback_warning = callback_fn;
+}
+
+void init_ConfigureMessage(void *inputList, void * errormsg, void * warningmsg){
+    tst_SensorInputs* input = (tst_SensorInputs*)inputList;
+    input->errorMessage = errormsg;
+    input->warningMessage = warningmsg;
+}
+
+
 int GetBatteryParamStatus(float sensorValue, void * inputList, void* inputValue){
      tst_SensorParm *sensorParm =  (tst_SensorParm*)inputList;
      tst_SensorInputs *input = (tst_SensorInputs*)inputValue;
      tst_PrintParm printParm;
-    if(sensorValue < input->limits.minValue ){
+     if(sensorValue < input->limits.minValue ){
         printParm.value = sensorValue;
         printParm.breachLevel = Breach_Low;
         printParm.Warning = Default;
         printParm.errorMessage = input->errorMessage;
         sensorParm->printMessage(&printParm);
         return Breach_Low;
-    }
-    else if(sensorValue > input->limits.maxValue){
+     }
+     else if(sensorValue > input->limits.maxValue){
         printParm.value = sensorValue;
         printParm.breachLevel = Breach_High;
         printParm.Warning = Default;
         printParm.errorMessage = input->errorMessage;
         sensorParm->printMessage(&printParm);
         return Breach_High;
-    }
-    else{
+     }
+     else{
 
        return input->callback_warning(sensorValue, sensorParm, input);;
-    }
+     }
 }
 
 int GetBatteryParamWarningStatus(float sensorValue, void *inputList, void * inputValue){
@@ -126,4 +129,37 @@ int CalculateTolerance(int value, int tolerance){
     return value*tolerance /100;
 }
 
+int main() {
 
+    //init parameters
+    sensorParm.printMessage = PrintMessage;
+
+    tst_SensorInputs tempInput ;
+    init_Limits(&tempInput, TempLimit, Temp_Tolerance);
+    init_registerCallback(&tempInput, GetBatteryParamWarningStatus);
+    init_ConfigureMessage(&tempInput,(void*)Temperature_out_of_range,
+                             (void*)Temperature_warning);
+    sensorParm.data[BATTERY_TEMPERATURE] = tempInput;
+
+    tst_SensorInputs socInput;
+    init_Limits(&socInput,SocLimit, Soc_Tolerance);
+    init_registerCallback(&socInput, GetBatteryParamWarningStatus);
+    init_ConfigureMessage(&socInput,(void*)State_of_Charge_out_of_range,
+                  (void*)Soc_Warning);
+    sensorParm.data[SOC] = socInput;
+
+
+    tst_SensorInputs chargeRateInput;
+    init_Limits(&chargeRateInput,ChargeRateLimit, ChargeRate_Tolerance);
+    init_registerCallback(&chargeRateInput, GetBatteryParamWarningStatus);
+    init_ConfigureMessage(&chargeRateInput,(void*)Charge_Rate_out_of_range,
+                  (void*)ChargeRate_Warning);
+    sensorParm.data[CHARGE_RATE] = chargeRateInput;
+
+    assert(batteryIsOk(25, 70, 0.7)== Valid);
+    assert(batteryIsOk(50, 85, 0) != Valid);
+    assert(batteryIsOk(70, 0, 0) != Valid);
+    assert(batteryIsOk(45, 80, 0.8) == Approaching_charge_peak);
+    assert(batteryIsOk(0, 20, 0.8) == Approaching_discharge);
+  return 0;
+}
